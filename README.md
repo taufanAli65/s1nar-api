@@ -27,7 +27,39 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
   - `budget_video` (number, optional, default: 0)
   - `budget_meme` (number, optional, default: 0)
   - `budget_gambar` (number, optional, default: 0)
-- Response: data narasi
+- **Contoh Request:**
+  ```
+  POST /narasi
+  Content-Type: multipart/form-data
+
+  judul: "Judul Narasi"
+  deskripsi: "Deskripsi"
+  id_organisasi: "ORG123"
+  expired_at: "2024-12-31T23:59:59Z"
+  status: "active"
+  crowdfund: 100000
+  foto: (file)
+  kategory_konten: "infografis"
+  budget_infografis: 50000
+  ```
+- **Contoh Response:**
+  ```json
+  {
+    "id": "narasiId123",
+    "judul": "Judul Narasi",
+    "deskripsi": "Deskripsi",
+    "id_organisasi": "ORG123",
+    "fotoUrl": "https://...",
+    "expired_at": "2024-12-31T23:59:59Z",
+    "status": "active",
+    "kategory_konten": "infografis",
+    "budget-infografis": 50000,
+    "budget-poster": 0,
+    "budget-video": 0,
+    "budget-meme": 0,
+    "budget-gambar": 0
+  }
+  ```
 
 #### Get All Narasi
 `GET /narasi`
@@ -35,26 +67,80 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
   - `page` (number, optional, default: 1)
   - `limit` (number, optional, default: 10)
   - `status` (string, optional: "active" / "non-active")
-- Response: list narasi (dengan namaOrganisasi dan fotoProfile)
+- **Contoh Response:**
+  ```json
+  [
+    {
+      "id": "narasiId123",
+      "judul": "Judul Narasi",
+      "deskripsi": "Deskripsi",
+      "id_organisasi": "ORG123",
+      "fotoUrl": "https://...",
+      "expired_at": "2024-12-31T23:59:59Z",
+      "status": "active",
+      "kategory_konten": "infografis",
+      "budget-infografis": 50000,
+      "budget-poster": 0,
+      "budget-video": 0,
+      "budget-meme": 0,
+      "budget-gambar": 0,
+      "namaOrganisasi": "Nama Organisasi",
+      "fotoProfile": "https://..."
+    }
+  ]
+  ```
 
 #### Get Narasi By ID
 `GET /narasi/:id`
-- Response: detail narasi (dengan namaOrganisasi dan fotoProfile)
+- **Contoh Response:**
+  ```json
+  {
+    "id": "narasiId123",
+    "judul": "Judul Narasi",
+    "deskripsi": "Deskripsi",
+    "id_organisasi": "ORG123",
+    "fotoUrl": "https://...",
+    "expired_at": "2024-12-31T23:59:59Z",
+    "status": "active",
+    "kategory_konten": "infografis",
+    "budget-infografis": 50000,
+    "budget-poster": 0,
+    "budget-video": 0,
+    "budget-meme": 0,
+    "budget-gambar": 0,
+    "namaOrganisasi": "Nama Organisasi",
+    "fotoProfile": "https://..."
+  }
+  ```
 
 #### Update Narasi
 `PUT /narasi/:id`
-- Body: field yang ingin diupdate, termasuk:
-  - `kategory_konten` (enum, lihat di atas)
-  - `budget_infografis`, `budget_poster`, `budget_video`, `budget_meme`, `budget_gambar`
-- Response: data narasi
+- **Contoh Request:**
+  ```json
+  {
+    "judul": "Judul Baru",
+    "status": "non-active"
+  }
+  ```
+- **Contoh Response:** sama seperti create/get
 
 #### Delete Narasi
 `DELETE /narasi/:id`
-- Response: `{ message: "Deleted" }`
+- **Contoh Response:**
+  ```json
+  { "message": "Deleted" }
+  ```
 
 #### Expire Narasi (ubah status jadi expired)
 `PATCH /narasi/:id/expired`
-- Response: data narasi setelah status diubah menjadi `expired`
+- **Contoh Response:**
+  ```json
+  {
+    "id": "narasiId123",
+    "status": "expired",
+    // ...field lain...
+  }
+  ```
 
 ---
 
@@ -62,27 +148,183 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 
 #### Tambah Crowdfund ke Narasi
 `POST /pembayaran`
-- JSON body:
-  - `narasiId` (string, required)
-  - `organisasiId` (string, required)
-  - `jumlah` (number, required)
-- Response: data pembayaran
+- **Contoh Request:**
+  ```json
+  {
+    "narasiId": "narasiId123",
+    "organisasiId": "ORG123",
+    "jumlah": 50000
+  }
+  ```
+- **Contoh Response:**
+  ```json
+  {
+    "narasiId": "narasiId123",
+    "organisasiId": "ORG123",
+    "jumlah": 50000,
+    "isInitial": false,
+    "userId": null,
+    "tipe": "narasi"
+  }
+  ```
 
 #### Get List Pembayaran per Narasi
 `GET /pembayaran/:narasiId`
-- Response: list pembayaran untuk narasi tersebut
+- **Contoh Response:**
+  ```json
+  [
+    {
+      "id": "pembayaranId1",
+      "narasiId": "narasiId123",
+      "organisasiId": "ORG123",
+      "jumlah": 50000,
+      "tanggal": "2024-06-01T12:00:00Z",
+      "isInitial": false,
+      "userId": null,
+      "tipe": "narasi"
+    }
+  ]
+  ```
 
 #### Tambah Crowdfund ke Organisasi
 `POST /pembayaran/organisasi`
-- JSON body:
-  - `organisasiId` (string, required)
-  - `jumlah` (number, required)
-  - `userId` (string, optional, untuk user biasa)
-- Response: data pembayaran
+- **Contoh Request:**
+  ```json
+  {
+    "organisasiId": "ORG123",
+    "jumlah": 100000,
+    "userId": "user123"
+  }
+  ```
+- **Contoh Response:**
+  ```json
+  {
+    "organisasiId": "ORG123",
+    "jumlah": 100000,
+    "userId": "user123",
+    "tipe": "organisasi"
+  }
+  ```
 
 #### Get List Pembayaran per Organisasi
 `GET /pembayaran/organisasi/:organisasiId`
-- Response: list crowdfund ke organisasi
+- **Contoh Response:**
+  ```json
+  [
+    {
+      "id": "pembayaranId2",
+      "organisasiId": "ORG123",
+      "jumlah": 100000,
+      "tanggal": "2024-06-01T12:00:00Z",
+      "userId": "user123",
+      "tipe": "organisasi"
+    }
+  ]
+  ```
+
+---
+
+### Idea
+
+#### Buat Idea (User)
+`POST /idea`
+- **Contoh Request:** (form-data)
+  ```
+  judul_ide: "Ide Keren"
+  deskripsi: "Penjelasan ide"
+  narasi_id: "narasiId123"
+  user_id: "user123"
+  attachment_file: (file)
+  ```
+- **Contoh Response:**
+  ```json
+  {
+    "id": "ideaId123",
+    "judul_ide": "Ide Keren",
+    "attachment_file": "https://...",
+    "deskripsi": "Penjelasan ide",
+    "narasi_id": "narasiId123",
+    "user_id": "user123",
+    "status": "pending",
+    "revisi_count": 0
+  }
+  ```
+
+#### Update Status Idea (Organisasi)
+`PATCH /idea/:id/status`
+- **Contoh Request:**
+  ```json
+  { "status": "revisi" }
+  ```
+- **Contoh Response:**
+  ```json
+  {
+    "id": "ideaId123",
+    "status": "revisi",
+    "revisi_count": 1
+    // ...field lain...
+  }
+  ```
+
+#### ACC Idea (Organisasi)
+`POST /idea/:id/acc`
+- **Contoh Response:**
+  ```json
+  {
+    "id": "ideaId123",
+    "judul_ide": "Ide Keren",
+    "status": "accepted",
+    "saldo_diterima": 50000,
+    // ...field lain...
+  }
+  ```
+
+#### Lihat Idea Berdasarkan Narasi (User)
+`GET /idea/narasi/:narasi_id`
+- **Contoh Response:** array of idea
+
+#### Lihat Idea Berdasarkan Kategori Narasi (User)
+`GET /idea/kategori/:kategory_konten`
+- **Contoh Response:** array of idea
+
+#### Lihat Idea yang Dibuat User
+`GET /idea/user/:user_id`
+- **Contoh Response:** array of idea
+
+#### Lihat Idea Berdasarkan Organisasi (Organisasi)
+`GET /idea/organisasi/:organisasi_id`
+- **Contoh Response:** array of idea
+
+---
+
+### Content
+
+#### Update Status Content (Organisasi)
+`PATCH /content/:id/status`
+- **Contoh Request:**
+  ```json
+  { "status": "revisi" }
+  ```
+- **Contoh Response:**
+  ```json
+  {
+    "id": "contentId123",
+    "status": "revisi",
+    "revisi_count": 1
+    // ...field lain...
+  }
+  ```
+
+---
+
+## Catatan Idea & Content
+
+- Status idea: `pending`, `revisi`, `accepted`, `rejected`.
+- Organisasi hanya bisa revisi maksimal 3x (baik di idea maupun content).
+- Jika organisasi ACC idea, maka:
+  - Idea dipindahkan ke koleksi `content`.
+  - User mendapat saldo sesuai budget narasi dan kategori.
+- Organisasi bisa update status content (revisi/selesai, revisi maksimal 3x).
 
 ---
 
@@ -99,25 +341,7 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 - `narasi`: { judul, deskripsi, id_organisasi, fotoUrl, expired_at, status, crowdfund }
 - `organisasi`: { nama, fotoProfile }
 - `pembayaran`: { narasiId, organisasiId, jumlah, tanggal, isInitial }
-
----
-
-## Contoh Request Create Narasi (dengan crowdfund dan foto)
-
-```
-POST /narasi
-Content-Type: multipart/form-data
-
-judul: "Judul Narasi"
-deskripsi: "Deskripsi"
-id_organisasi: "ORG123"
-expired_at: "2024-12-31T23:59:59Z"
-status: "active"
-crowdfund: 100000
-foto: (file)
-kategory_konten: "infografis"
-budget_infografis: 50000
-```
+- `idea`: { judul_ide, deskripsi, narasi_id, user_id, revisi, attachment_file }
 
 ---
 

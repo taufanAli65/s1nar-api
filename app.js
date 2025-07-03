@@ -23,6 +23,12 @@ app.use("/narasi", narasiRoutes);
 const pembayaranRoutes = require("./routes/pembayaranRoutes");
 app.use("/pembayaran", pembayaranRoutes);
 
+const ideaRoutes = require("./routes/ideaRoutes");
+app.use("/idea", ideaRoutes);
+
+const contentRoutes = require("./routes/contentRoutes");
+app.use("/content", contentRoutes);
+
 app.listen(3000, () => {
     console.log("http://localhost:3000")
 })
