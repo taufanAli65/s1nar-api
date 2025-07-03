@@ -133,3 +133,12 @@ exports.deleteNarasi = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.expireNarasi = async (req, res) => {
+  try {
+    const narasi = await narasiService.updateNarasi(req.params.id, { status: "expired" });
+    res.json(narasi);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

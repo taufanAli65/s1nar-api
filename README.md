@@ -52,11 +52,15 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 `DELETE /narasi/:id`
 - Response: `{ message: "Deleted" }`
 
+#### Expire Narasi (ubah status jadi expired)
+`PATCH /narasi/:id/expired`
+- Response: data narasi setelah status diubah menjadi `expired`
+
 ---
 
 ### Pembayaran / Crowdfund
 
-#### Tambah Crowdfund
+#### Tambah Crowdfund ke Narasi
 `POST /pembayaran`
 - JSON body:
   - `narasiId` (string, required)
@@ -68,16 +72,25 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 `GET /pembayaran/:narasiId`
 - Response: list pembayaran untuk narasi tersebut
 
+#### Tambah Crowdfund ke Organisasi
+`POST /pembayaran/organisasi`
+- JSON body:
+  - `organisasiId` (string, required)
+  - `jumlah` (number, required)
+  - `userId` (string, optional, untuk user biasa)
+- Response: data pembayaran
+
+#### Get List Pembayaran per Organisasi
+`GET /pembayaran/organisasi/:organisasiId`
+- Response: list crowdfund ke organisasi
+
 ---
 
 ## Catatan
 
-- Organisasi wajib mengisi crowdfund sendiri saat membuat narasi pertamanya.
-- Crowdfund narasi akan bertambah setiap ada pembayaran baru.
-- Upload foto narasi menggunakan field `foto` (form-data, file).
-- Data organisasi diambil dari koleksi `organisasi` (field: nama, fotoProfile).
-- Field `kategory_konten` wajib diisi dan hanya boleh salah satu dari: `infografis`, `poster`, `video`, `meme`, `gambar`.
-- Field budget per kategori (`budget_infografis`, dst) dapat diisi sesuai kebutuhan, default 0 jika tidak diisi.
+- User biasa dapat memberikan crowdfund langsung ke organisasi (`/pembayaran/organisasi`) atau ke narasi tertentu (`/pembayaran`).
+- Organisasi juga dapat mengisi crowdfund ke narasi sendiri (khusus narasi pertama wajib).
+- Field `userId` pada crowdfund ke organisasi opsional, jika diisi berarti crowdfund dari user biasa.
 
 ---
 

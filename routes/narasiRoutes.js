@@ -8,5 +8,6 @@ router.get("/", narasiController.getAllNarasi);
 router.get("/:id", narasiController.getNarasiById);
 router.put("/:id", narasiController.updateNarasi);
 router.delete("/:id", narasiController.deleteNarasi);
+router.patch("/:id/expired", narasiController.expireNarasi);
 
 module.exports = router;

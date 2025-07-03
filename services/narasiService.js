@@ -16,13 +16,16 @@ async function createNarasi({
   budget_meme,
   budget_gambar,
 }) {
+  // Pastikan status hanya "active" atau "non-active"
+  const allowedStatus = ["active", "non-active"];
+  const safeStatus = allowedStatus.includes(status) ? status : "active";
   const docRef = await collection.add({
     judul,
     deskripsi,
     id_organisasi,
     fotoUrl,
     expired_at,
-    status,
+    status: safeStatus,
     kategory_konten,
     "budget-infografis": budget_infografis || 0,
     "budget-poster": budget_poster || 0,
@@ -37,7 +40,7 @@ async function createNarasi({
     id_organisasi,
     fotoUrl,
     expired_at,
-    status,
+    status: safeStatus,
     kategory_konten,
     "budget-infografis": budget_infografis || 0,
     "budget-poster": budget_poster || 0,
@@ -54,6 +57,11 @@ async function getNarasiById(id) {
 }
 
 async function updateNarasi(id, data) {
+  // Pastikan status hanya "active" atau "non-active" jika ada update status
+  if (data.status) {
+    const allowedStatus = ["active", "non-active"];
+    data.status = allowedStatus.includes(data.status) ? data.status : "active";
+  }
   await collection.doc(id).update(data);
   return getNarasiById(id);
 }
@@ -67,7 +75,11 @@ async function deleteNarasi(id) {
 async function getNarasiList({ page = 1, limit = 10, status, search }) {
   let query = collection;
   if (status) {
-    query = query.where("status", "==", status);
+    // Filter hanya jika status valid
+    const allowedStatus = ["active", "non-active"];
+    if (allowedStatus.includes(status)) {
+      query = query.where("status", "==", status);
+    }
   }
   // Pagination
   const offset = (page - 1) * limit;
