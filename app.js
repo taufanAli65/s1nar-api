@@ -1,6 +1,6 @@
 const express = require("express")
 const admin = require("firebase-admin");
-const serviceAccount = require("./service_account.json");
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 require("dotenv").config();
 const { createClient } = require("@supabase/supabase-js");
 
