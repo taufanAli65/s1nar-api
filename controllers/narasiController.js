@@ -5,8 +5,27 @@ const pembayaranService = require("../services/pembayaranService");
 
 exports.createNarasi = async (req, res) => {
   try {
-    const { judul, deskripsi, id_organisasi, expired_at, status, crowdfund } = req.body;
+    const {
+      judul,
+      deskripsi,
+      id_organisasi,
+      expired_at,
+      status,
+      crowdfund,
+      kategory_konten,
+      budget_infografis,
+      budget_poster,
+      budget_video,
+      budget_meme,
+      budget_gambar,
+    } = req.body;
     const fotoUrl = req.fotoUrl || null;
+
+    // Validasi enum kategori konten
+    const allowedKategori = ["infografis", "poster", "video", "meme", "gambar"];
+    if (!allowedKategori.includes(kategory_konten)) {
+      return res.status(400).json({ error: "kategory_konten harus salah satu dari: " + allowedKategori.join(", ") });
+    }
 
     // Cek jika narasi pertama, crowdfund wajib diisi dan organisasi harus mengisi crowdfund sendiri
     const isFirst = await isFirstNarasiForOrganisasi(id_organisasi);
@@ -22,6 +41,12 @@ exports.createNarasi = async (req, res) => {
       fotoUrl,
       expired_at: expired_at || null,
       status: status || "active",
+      kategory_konten,
+      budget_infografis: Number(budget_infografis) || 0,
+      budget_poster: Number(budget_poster) || 0,
+      budget_video: Number(budget_video) || 0,
+      budget_meme: Number(budget_meme) || 0,
+      budget_gambar: Number(budget_gambar) || 0,
     });
 
     // Jika narasi pertama, organisasi harus mengisi crowdfund sendiri
@@ -81,7 +106,19 @@ exports.getNarasiById = async (req, res) => {
 
 exports.updateNarasi = async (req, res) => {
   try {
-    const narasi = await narasiService.updateNarasi(req.params.id, req.body);
+    const data = { ...req.body };
+    // Validasi enum jika ada update kategori konten
+    if (data.kategory_konten) {
+      const allowedKategori = ["infografis", "poster", "video", "meme", "gambar"];
+      if (!allowedKategori.includes(data.kategory_konten)) {
+        return res.status(400).json({ error: "kategory_konten harus salah satu dari: " + allowedKategori.join(", ") });
+      }
+    }
+    // Pastikan budget dikonversi ke number jika ada
+    ["budget_infografis", "budget_poster", "budget_video", "budget_meme", "budget_gambar"].forEach(key => {
+      if (data[key] !== undefined) data[key] = Number(data[key]) || 0;
+    });
+    const narasi = await narasiService.updateNarasi(req.params.id, data);
     res.json(narasi);
   } catch (err) {
     res.status(500).json({ error: err.message });

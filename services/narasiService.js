@@ -2,9 +2,49 @@ const admin = require("firebase-admin");
 const db = admin.firestore();
 const collection = db.collection("narasi");
 
-async function createNarasi({ judul, deskripsi, id_organisasi, fotoUrl, expired_at, status }) {
-  const docRef = await collection.add({ judul, deskripsi, id_organisasi, fotoUrl, expired_at, status });
-  return { id: docRef.id, judul, deskripsi, id_organisasi, fotoUrl, expired_at, status };
+async function createNarasi({
+  judul,
+  deskripsi,
+  id_organisasi,
+  fotoUrl,
+  expired_at,
+  status,
+  kategory_konten,
+  budget_infografis,
+  budget_poster,
+  budget_video,
+  budget_meme,
+  budget_gambar,
+}) {
+  const docRef = await collection.add({
+    judul,
+    deskripsi,
+    id_organisasi,
+    fotoUrl,
+    expired_at,
+    status,
+    kategory_konten,
+    "budget-infografis": budget_infografis || 0,
+    "budget-poster": budget_poster || 0,
+    "budget-video": budget_video || 0,
+    "budget-meme": budget_meme || 0,
+    "budget-gambar": budget_gambar || 0,
+  });
+  return {
+    id: docRef.id,
+    judul,
+    deskripsi,
+    id_organisasi,
+    fotoUrl,
+    expired_at,
+    status,
+    kategory_konten,
+    "budget-infografis": budget_infografis || 0,
+    "budget-poster": budget_poster || 0,
+    "budget-video": budget_video || 0,
+    "budget-meme": budget_meme || 0,
+    "budget-gambar": budget_gambar || 0,
+  };
 }
 
 async function getNarasiById(id) {

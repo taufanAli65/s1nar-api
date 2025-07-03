@@ -21,6 +21,12 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
   - `status` (string, optional, default: "active")
   - `crowdfund` (number, required jika narasi pertama organisasi)
   - `foto` (file, optional)
+  - `kategory_konten` (enum, required): Salah satu dari `infografis`, `poster`, `video`, `meme`, `gambar`
+  - `budget_infografis` (number, optional, default: 0)
+  - `budget_poster` (number, optional, default: 0)
+  - `budget_video` (number, optional, default: 0)
+  - `budget_meme` (number, optional, default: 0)
+  - `budget_gambar` (number, optional, default: 0)
 - Response: data narasi
 
 #### Get All Narasi
@@ -37,7 +43,9 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 
 #### Update Narasi
 `PUT /narasi/:id`
-- Body: field yang ingin diupdate
+- Body: field yang ingin diupdate, termasuk:
+  - `kategory_konten` (enum, lihat di atas)
+  - `budget_infografis`, `budget_poster`, `budget_video`, `budget_meme`, `budget_gambar`
 - Response: data narasi
 
 #### Delete Narasi
@@ -68,6 +76,8 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 - Crowdfund narasi akan bertambah setiap ada pembayaran baru.
 - Upload foto narasi menggunakan field `foto` (form-data, file).
 - Data organisasi diambil dari koleksi `organisasi` (field: nama, fotoProfile).
+- Field `kategory_konten` wajib diisi dan hanya boleh salah satu dari: `infografis`, `poster`, `video`, `meme`, `gambar`.
+- Field budget per kategori (`budget_infografis`, dst) dapat diisi sesuai kebutuhan, default 0 jika tidak diisi.
 
 ---
 
@@ -92,6 +102,8 @@ expired_at: "2024-12-31T23:59:59Z"
 status: "active"
 crowdfund: 100000
 foto: (file)
+kategory_konten: "infografis"
+budget_infografis: 50000
 ```
 
 ---
