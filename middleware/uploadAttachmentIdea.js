@@ -1,6 +1,7 @@
 const multer = require("multer");
-const supabase = require("../app");
+const { supabase } = require("../supabaseClient"); // <-- updated import
 
+// Expected field name: "attachment_file"
 const upload = multer();
 
 const uploadAttachmentIdea = [
@@ -15,7 +16,7 @@ const uploadAttachmentIdea = [
       const fileName = `idea/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const { error } = await supabase
         .storage
-        .from("attachment-idea")
+        .from("s1nar-app")
         .upload(fileName, req.file.buffer, {
           contentType: req.file.mimetype,
         });
@@ -24,12 +25,16 @@ const uploadAttachmentIdea = [
 
       const { data: publicUrlData } = supabase
         .storage
-        .from("attachment-idea")
+        .from("s1nar-app")
         .getPublicUrl(fileName);
 
       req.attachmentUrl = publicUrlData.publicUrl;
       next();
     } catch (err) {
+      // MulterError: Unexpected field
+      if (err.name === "MulterError" && err.code === "LIMIT_UNEXPECTED_FILE") {
+        return res.status(400).json({ error: "Field file harus bernama 'attachment_file'" });
+      }
       res.status(500).json({ error: err.message });
     }
   }

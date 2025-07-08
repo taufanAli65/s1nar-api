@@ -7,7 +7,7 @@ async function tambahCrowdfund(narasiId, organisasiId, jumlah, isInitial = false
   await pembayaranRef.set({
     narasiId,
     organisasiId,
-    jumlah,
+    jumlah: Number(jumlah),
     tanggal: admin.firestore.FieldValue.serverTimestamp(),
     isInitial,
     userId: userId || null,
@@ -20,7 +20,7 @@ async function tambahCrowdfund(narasiId, organisasiId, jumlah, isInitial = false
     const narasiDoc = await t.get(narasiRef);
     if (!narasiDoc.exists) throw new Error("Narasi tidak ditemukan");
     const prev = narasiDoc.data().crowdfund || 0;
-    t.update(narasiRef, { crowdfund: prev + jumlah });
+    t.update(narasiRef, { crowdfund: prev + Number(jumlah) });
   });
 
   return { narasiId, organisasiId, jumlah, isInitial, userId, tipe: "narasi" };
@@ -31,7 +31,7 @@ async function tambahCrowdfundOrganisasi(organisasiId, jumlah, userId = null) {
   const pembayaranRef = db.collection("pembayaran").doc();
   await pembayaranRef.set({
     organisasiId,
-    jumlah,
+    jumlah: Number(jumlah),
     tanggal: admin.firestore.FieldValue.serverTimestamp(),
     userId: userId || null,
     tipe: "organisasi"
@@ -43,7 +43,7 @@ async function tambahCrowdfundOrganisasi(organisasiId, jumlah, userId = null) {
     const orgDoc = await t.get(orgRef);
     if (!orgDoc.exists) throw new Error("Organisasi tidak ditemukan");
     const prev = orgDoc.data().crowdfund || 0;
-    t.update(orgRef, { crowdfund: prev + jumlah });
+    t.update(orgRef, { crowdfund: prev + Number(jumlah) });
   });
 
   return { organisasiId, jumlah, userId, tipe: "organisasi" };

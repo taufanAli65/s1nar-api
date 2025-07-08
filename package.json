@@ -20,6 +20,7 @@
   "homepage": "https://github.com/taufanAli65/s1nar-api#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
+    "cors": "^2.8.5",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "firebase-admin": "^13.4.0",

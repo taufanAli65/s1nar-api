@@ -18,6 +18,7 @@ exports.createNarasi = async (req, res) => {
       budget_video,
       budget_meme,
       budget_gambar,
+      userId, // <-- allow userId in body
     } = req.body;
     const fotoUrl = req.fotoUrl || null;
 
@@ -49,9 +50,23 @@ exports.createNarasi = async (req, res) => {
       budget_gambar: Number(budget_gambar) || 0,
     });
 
-    // Jika narasi pertama, organisasi harus mengisi crowdfund sendiri
+    // Jika narasi pertama, organisasi harus mengisi crowdfund sendiri dan saldo dikurangi
     if (isFirst) {
-      await pembayaranService.tambahCrowdfund(narasi.id, id_organisasi, Number(crowdfund), true);
+      if (!userId) {
+        return res.status(400).json({ error: "userId wajib diisi untuk narasi pertama (organisasi)" });
+      }
+      // Deduct saldo from organisasi wallet
+      const admin = require("firebase-admin");
+      const db = admin.firestore();
+      const userRef = db.collection("user").doc(userId);
+      await db.runTransaction(async (t) => {
+        const userDoc = await t.get(userRef);
+        if (!userDoc.exists) throw new Error("User tidak ditemukan");
+        const prev = userDoc.data().saldo || 0;
+        if (prev < Number(crowdfund)) throw new Error("Saldo tidak cukup");
+        t.update(userRef, { saldo: prev - Number(crowdfund) });
+      });
+      await pembayaranService.tambahCrowdfund(narasi.id, id_organisasi, Number(crowdfund), true, userId);
     }
 
     res.status(201).json(narasi);

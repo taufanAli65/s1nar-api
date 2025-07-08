@@ -148,6 +148,9 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 
 #### Tambah Crowdfund ke Narasi
 `POST /pembayaran`
+- **Catatan tambahan:**  
+  - Jika field `userId` diisi, saldo user/organisasi akan otomatis dikurangi sesuai jumlah donasi.
+  - Jika narasi pertama, organisasi wajib mengisi crowdfund dan saldo organisasi akan dikurangi.
 - **Contoh Request:**
   ```json
   {
@@ -349,3 +352,96 @@ API ini menyediakan fitur CRUD narasi, upload foto ke Supabase Storage, crowdfun
 
 - Pastikan sudah install dependensi: `npm install`
 - Jalankan server: `node app.js`
+
+## Auth
+
+### Register User (dengan Upload Foto)
+
+**Endpoint:**  
+`POST /auth/register`
+
+**Deskripsi:**  
+Registrasi user baru (role: `creator` atau `organisasi`). Bisa upload foto profil yang akan disimpan di Supabase.
+
+**Headers:**  
+`Content-Type: multipart/form-data`
+
+**Body (form-data):**
+- `email` (string, required)
+- `password` (string, required)
+- `role` (string, required, "creator" atau "organisasi")
+- `nama` (string, required jika role=organisasi)
+- `deskripsi` (string, optional, untuk creator/organisasi)
+- `domisili` (string, optional, hanya untuk creator)
+- `website` (string, optional, hanya untuk organisasi)
+- `facebook` (string, optional, hanya untuk organisasi)
+- `instagram` (string, optional, hanya untuk organisasi)
+- `linkedin` (string, optional, hanya untuk organisasi)
+- `foto` (file, optional) — file gambar yang akan diupload ke Supabase
+
+- **Catatan:**  
+  - Jika role = `creator`, field tambahan: `deskripsi` dan `domisili` akan disimpan pada user.
+  - Jika role = `organisasi`, field tambahan: `deskripsi`, `website`, `facebook`, `instagram`, `linkedin` akan disimpan pada organisasi.
+role: organisasi
+nama: Organisasi Hebat
+foto: [file image]
+```
+
+**Contoh Response:**
+```json
+{
+  "message": "Account created",
+  "uid": "firebase-uid",
+  "role": "organisasi",
+  "fotoUrl": "https://your-supabase-url/storage/v1/object/public/foto-narasi/narasi/1680000000000-xxxxxx.jpg"
+}
+```
+
+**Catatan:**  
+- Jika tidak mengupload foto, field `fotoUrl` akan bernilai `null`.
+- Untuk login, gunakan Firebase Auth client SDK di frontend.
+
+### Login
+
+`POST /auth/login`
+
+- **Body (JSON):**
+  - `email` (string, required)
+  - `password` (string, required)
+
+- **Catatan Penting:**
+  - Untuk login, gunakan Firebase Auth client SDK di frontend untuk mendapatkan ID token.
+  - Endpoint ini hanya placeholder. Kirimkan ID token ke backend untuk verifikasi jika dibutuhkan.
+
+- **Contoh Response:**
+  ```json
+  {
+    "error": "Use Firebase Auth client SDK to sign in and send ID token to backend."
+  }
+  ```
+
+### Top Up Saldo
+
+`POST /pembayaran/topup`
+- **Body (JSON):**
+  - `userId` (string, required)
+  - `jumlah` (number, required)
+- **Contoh Response:**
+  ```json
+  {
+    "message": "Top up berhasil",
+    "userId": "user123",
+    "jumlah": 100000
+  }
+  ```
+
+### Cek Saldo User
+
+`GET /pembayaran/saldo/:userId`
+- **Contoh Response:**
+  ```json
+  {
+    "userId": "user123",
+    "saldo": 150000
+  }
+  ```
